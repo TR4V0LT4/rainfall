@@ -127,7 +127,6 @@ The target is a vulnerable binary named `level3` from the RainFall wargame on Li
 - Overwrite a global variable `m` with the value `0x40`
 - Satisfy the condition `if (m == 0x40)` to execute `system("/bin/sh")`
 
----
 
 ## 🔐 Binary Protections
 
@@ -138,6 +137,7 @@ No RELRO        No canary found   NX disabled   No PIE          ./level3
 
 $ cat /proc/sys/kernel/randomize_va_space
 0
+```
 ```
 void v(void) {
   char local_20c[520];
