@@ -518,6 +518,26 @@ This should cause:
 
 LEVEL_7:
 
+# Heap overflow
+What's happening in the code
+
+This program appears to take two command-line arguments, stores them in malloced memory, and copies them using strcpy():
+```
+strcpy((char *)puVar1[1], *(char **)(param_2 + 4));  // argv[1]
+strcpy((char *)puVar3[1], *(char **)(param_2 + 8));  // argv[2]
+```
+Then it reads a secret file into a global variable c:
+```
+fgets(c, 0x44, __stream);  // Read password into c
+puts('~~')
+```
+The goal is to somehow call the m() function, which prints c, thus leaking the password.
+```
+printf("%s - %d\n", c, time(0));
+```
+So the input is directly copied into malloc'd memory, with no length checking. This is a classic heap-based *buffer overflow*.
+
+## How to exploit it
 ### overwriting the GOT entry for puts(), which the program does definitely call right after reading the password.
 After reading the secret into c, main() does:
 If you overwrite the GOT slot for puts with the address of m, then:
@@ -594,6 +614,7 @@ Segmentation fault (core dumped)
 5684af5cb4c8679958be4abe6373147ab52d95768e047820bf382e44fa8d8fb9
  - 1754601545
 ```
+
 
 
 
