@@ -432,9 +432,6 @@ whoami
 level6
 ```
 LEVEL_7:
-Got it — if you're getting just `Nope`, that usually means your overflow didn't succeed in overwriting the function pointer, and the program just called the original function (`m`), which prints "Nope" or something similar.
-
-Let’s go through a **step-by-step checklist** to make sure your heap overflow works properly.
 
 ---
 
@@ -518,6 +515,7 @@ This should cause:
 * When `main()` executes `call *eax`, it will actually call `n()`, which runs `system("/bin/sh")`
 
 ---
+
 
 
 
