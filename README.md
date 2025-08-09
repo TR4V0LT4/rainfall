@@ -4,15 +4,6 @@
 
 RainFall is a binary exploitation wargame that focuses on teaching various memory corruption vulnerabilities and exploitation techniques. This repository contains detailed writeups and solutions for all levels of the RainFall challenge.
 
-## Project Structure
-
-```
-rainfall/
-├── README.md           # This file
-├── writeup.md         # Detailed solutions for all levels
-└── passwords.txt      # Collected passwords from each level
-```
-
 ## Challenge Levels
 
 ### Level 1: Stack Buffer Overflow
@@ -143,6 +134,7 @@ Feel free to:
 - Add alternative solution methods
 - Enhance documentation
 - Report issues or errors
+
 
 
 
