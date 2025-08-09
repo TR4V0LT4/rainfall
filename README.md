@@ -1,4 +1,4 @@
-# RainFall Wargame Solutions
+# RainFall
 
 ## Overview
 
@@ -10,8 +10,6 @@ RainFall is a binary exploitation wargame that focuses on teaching various memor
 rainfall/
 ├── README.md           # This file
 ├── writeup.md         # Detailed solutions for all levels
-├── level2/            # Level-specific files and exploits
-├── test/              # Test scripts and utilities
 └── passwords.txt      # Collected passwords from each level
 ```
 
@@ -94,27 +92,6 @@ Most RainFall binaries have minimal protections:
 - Function pointer overwrites
 - Chunk corruption
 
-## Getting Started
-
-1. **Set up environment**:
-   ```bash
-   # Ensure 32-bit support
-   sudo apt-get install gcc-multilib gdb python
-   ```
-
-2. **Analyze a binary**:
-   ```bash
-   file ./level1
-   checksec ./level1
-   objdump -d ./level1
-   ```
-
-3. **Debug and exploit**:
-   ```bash
-   gdb ./level1
-   # Use GDB to analyze and test exploits
-   ```
-
 ## Security Lessons
 
 ### Key Takeaways
@@ -152,8 +129,6 @@ This repository is for educational purposes only. The techniques demonstrated sh
 
 ### Documentation
 - [Detailed writeups](writeup.md)
-- [GDB Cheat Sheet](https://darkdust.net/files/GDB%20Cheat%20Sheet.pdf)
-- [Shellcode Database](http://shell-storm.org/shellcode/)
 
 ### References
 - OWASP Binary Exploitation
@@ -169,7 +144,5 @@ Feel free to:
 - Enhance documentation
 - Report issues or errors
 
-## Disclaimer
 
-The information provided in this repository is for educational and research purposes only. Users are responsible for ensuring they have proper authorization before testing these techniques on any systems.
 
