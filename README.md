@@ -1,5 +1,5 @@
-# RainFall Wargame Solutions
-
+# RainFall
+![header](rain.jpg)
 ## Overview
 
 RainFall is a binary exploitation wargame that focuses on teaching various memory corruption vulnerabilities and exploitation techniques. This repository contains detailed writeups and solutions for all levels of the RainFall challenge.
@@ -10,8 +10,7 @@ RainFall is a binary exploitation wargame that focuses on teaching various memor
 rainfall/
 ├── README.md           # This file
 ├── writeup.md         # Detailed solutions for all levels
-├── level2/            # Level-specific files and exploits
-├── test/              # Test scripts and utilities
+├── binaries/          # contain the binaries of all the levels
 └── passwords.txt      # Collected passwords from each level
 ```
 
@@ -60,10 +59,6 @@ rainfall/
 - **readelf**: For binary analysis and GOT/PLT inspection
 - **objdump**: For disassembly and code analysis
 
-### System Requirements
-- Linux environment (preferably 32-bit or with 32-bit support)
-- GCC with 32-bit compilation support
-- Standard development tools
 
 ## Binary Protections
 
@@ -94,80 +89,17 @@ Most RainFall binaries have minimal protections:
 - Function pointer overwrites
 - Chunk corruption
 
-## Getting Started
-
-1. **Set up environment**:
-   ```bash
-   # Ensure 32-bit support
-   sudo apt-get install gcc-multilib gdb python
-   ```
-
-2. **Analyze a binary**:
-   ```bash
-   file ./level1
-   checksec ./level1
-   objdump -d ./level1
-   ```
-
-3. **Debug and exploit**:
-   ```bash
-   gdb ./level1
-   # Use GDB to analyze and test exploits
-   ```
-
-## Security Lessons
-
-### Key Takeaways
-1. **Input Validation**: Always validate and sanitize user input
-2. **Buffer Bounds**: Use safe string functions and proper bounds checking
-3. **Format Strings**: Never use user input directly in format strings
-4. **Memory Protections**: Enable modern security features (ASLR, DEP, Stack Canaries)
-5. **Heap Security**: Understand heap layout and implement heap protections
-
-### Modern Mitigations
-- **Stack Canaries**: Detect stack buffer overflows
-- **ASLR**: Randomize memory layout
-- **DEP/NX**: Prevent code execution in data areas
-- **FORTIFY_SOURCE**: Enhanced runtime checks
-- **Control Flow Integrity**: Prevent ROP/JOP attacks
-
-## Educational Value
-
-This wargame teaches:
-- Binary exploitation fundamentals
-- Memory corruption vulnerabilities
-- Debugging and reverse engineering skills
-- Exploit development techniques
-- Security mitigation bypass methods
-
-## Ethical Use
-
-This repository is for educational purposes only. The techniques demonstrated should only be used in:
-- Authorized penetration testing
-- Security research environments
-- Educational settings
-- Personal learning on your own systems
-
 ## Resources
 
 ### Documentation
 - [Detailed writeups](writeup.md)
-- [GDB Cheat Sheet](https://darkdust.net/files/GDB%20Cheat%20Sheet.pdf)
-- [Shellcode Database](http://shell-storm.org/shellcode/)
 
 ### References
-- OWASP Binary Exploitation
+<!-- - OWASP Binary Exploitation
 - Phrack Magazine
 - "The Shellcoder's Handbook"
-- "Hacking: The Art of Exploitation"
+- "Hacking: The Art of Exploitation" -->
 
-## Contributing
-
-Feel free to:
-- Improve existing writeups
-- Add alternative solution methods
-- Enhance documentation
-- Report issues or errors
 
 ## Disclaimer
 
