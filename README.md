@@ -1,5 +1,5 @@
 # RainFall
-![header](rain.jpg)
+![header](/binaries/rain.jpg)
 ## Overview
 
 RainFall is a binary exploitation wargame that focuses on teaching various memory corruption vulnerabilities and exploitation techniques. This repository contains detailed writeups and solutions for all levels of the RainFall challenge.

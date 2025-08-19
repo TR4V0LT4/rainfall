@@ -40,10 +40,10 @@ setAnnotation:
 
 Vtable Functions:
 ```
-cint __thiscall N::operator+(N *this, N *param_1) {
+int __thiscall N::operator+(N *this, N *param_1) {
   return *(int *)(param_1 + 0x68) + *(int *)(this + 0x68);
 }
-int __thiscall N::operator-(N *this, N *param_1) {
+int __thiscall N::operator-(N *this, N *param_1) 
 ```
 
 Behavior:

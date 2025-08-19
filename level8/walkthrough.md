@@ -11,7 +11,7 @@ int		main(void)
 		printf("%p, %p\n", auth, service);
 		if (fgets(buffer, 128, stdin) == 0)
 			break;
-		if (strncmp(buffer, "auth ", 5) == 0)
+		if (strncmp(buffer, "auth ", 4) == 0)
 		{
 			auth = malloc(4);
 			auth[0] = 0;
