@@ -1,12 +1,14 @@
-LEVEL_0:
-# 📚 Exploiting `level0`
-> scp -P 4242 level@192.168.0.111:/home/user/level/level ./level : copy binary file to host machine 
+<h1 align="center"> LEVEL 0 </h1>
+
+## 🔍 Analysis of Decompiled [level0](./source.c)
+copy binary file to host machine:
+
+> scp -P 4242 level@ip:/home/user/level0/level0 ./level0 
+
+## 💥 Exploit
+To solve the level, simply run the program with 423 as the argument:
 ```
 ./level0 423
 $ cd ..
-$ cd level1 
-$ cat .pass 
-```
-```
-1fe8a524fa4bec01ca4ea2a869af2a02260d4a7d5fe7e7c24d8617e6dca12d3a
+$ cd level1
 ```
