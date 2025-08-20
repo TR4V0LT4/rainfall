@@ -50,6 +50,23 @@ for i in $(seq 1 40); do
 done
 ```
 Look for 41414141 in the output. appears at %4$x, that means the offset is 7.
+
+The string ' %%%d\$x' % $i
+
+In Python string formatting with %, the %d is replaced by the value of $i (a shell variable).
+
+%%%d\$x becomes:
+
+%% → a literal % in the string.
+
+%d → replaced by the number $i.
+
+\$x → literally $x.
+
+So if $i = 4, it becomes: %4$x
+
+This is a format specifier for printf in C. It means: “print the 4th argument as a hexadecimal number.”
+
 ## Step 3: Exploit Script (Python)
 ```
 import struct
