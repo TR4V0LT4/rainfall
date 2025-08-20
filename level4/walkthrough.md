@@ -3,7 +3,7 @@ LEVEL_4:
 
 ## 🔍 Challenge Summary
 
-The target is a vulnerable binary named `level4` from the RainFall wargame on Linux. Our goal is to:
+The target is a vulnerable binary named `level4`. Our goal is to:
 
 - Exploit a **format string vulnerability** in `printf()`
 - Overwrite a global variable `m` with the value `0x1025544`
