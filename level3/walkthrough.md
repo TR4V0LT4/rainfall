@@ -1,9 +1,8 @@
 LEVEL_3:
 # 📚 Exploiting `level3` – Format String Vulnerability to Overwrite Global Variable
 
-## 🔍 Challenge Summary
 
-The target is a vulnerable binary named `level3` from the RainFall wargame on Linux. Our goal is to:
+The target is a vulnerable binary named `level3`. Our goal is to:
 
 - Exploit a **format string vulnerability** in `printf()`
 - Overwrite a global variable `m` with the value `0x40`
