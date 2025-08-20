@@ -1,6 +1,6 @@
-LEVEL_9:
-# 📚 Exploiting level9
--rwsr-s---+ 1 bonus0 users 6720 Mar  6  2016 level9 </br>
+<h1 align="center"> LEVEL 9 </h1>
+
+## 🔍 Analysis of Decompiled [level9](./source.c)
 The level9 binary is a C++ program that runs with privileges for bonus0, where a class N with a vtable (for virtual functions like operator+ and operator-).
 The program takes a command-line argument (argv[1]) and processes it through a vulnerable function.
 
@@ -137,7 +137,7 @@ Use setAnnotation’s memcpy to overwrite the vtable pointer at 0x804a080.</br>
 Set it to point to a heap address (0x0804a00c) that contains the address of system (0xb7d86060).
 Place "/bin/sh" nearby (0x804a084) to serve as the argument to system.
 
-### Payload Construction
+## 💥 Exploit 
 
 Total Length: 4 + 104 + 4 + 8 = 120 bytes (ensures memcpy copies all data, as strlen stops at null bytes).
 

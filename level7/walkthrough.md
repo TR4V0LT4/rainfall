@@ -1,7 +1,6 @@
-LEVEL_7:
-# 📚 Exploiting `level7` – overwrite the function pointer
+<h1 align="center"> LEVEL 7 </h1>
 
-# Heap overflow
+## 🔍 Analysis of Decompiled [level7](./source.c)
 What's happening in the code
 
 This program appears to take two command-line arguments, stores them in malloced memory, and copies them using strcpy():
@@ -31,12 +30,13 @@ becomes effectively:
 ```
 m("~~", /*garbage*/, /*garbage*/, /*garbage*/, /*garbage*/);
 ```
-## Find the puts@GOT address
+## 💥 Exploit 
+### Find the puts@GOT address
 ```
 level7@RainFall:~$ readelf -r ./level7 | grep ' R_386_JUMP_SLOT.*puts'
 08049928  00000607 R_386_JUMP_SLOT   00000000   puts
 ```
-## Find the address of m()
+### Find the address of m()
 ```
 gdb ./level7
 (gdb) p m

