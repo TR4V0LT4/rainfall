@@ -54,7 +54,7 @@ Chunk C (8 bytes) → contains [2, ptr_to_D]
 
 Chunk D (8 bytes) → destination of argv[2]
 
-### Stage 1: Overflow Chunk B to point puVar3[1] at puts@GOT
+### Stage 1: Overflow Chunk B to point b[1] at puts@GOT
 ```
 #!/usr/bin/env python2
 import sys
