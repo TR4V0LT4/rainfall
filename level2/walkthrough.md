@@ -5,9 +5,9 @@ this is a heap overflow, we execute shellcode from the heap using strdup().
 Exploit Strategy:</br>
 
 Inject shellcode into local_50 buffer:
-  - 2.strdup(local_50) copies this shellcode to heap at a predictable address (found via GDB).
-  - 3.Overflow RET to point to the heap address returned by strdup().
-  - 4.When p() returns → EIP = heap → shellcode executes → /bin/sh spawns.
+  - strdup(local_50) copies this shellcode to heap at a predictable address (found via GDB).
+  - Overflow RET to point to the heap address returned by strdup().
+  - When p() returns → EIP = heap → shellcode executes → /bin/sh spawns.
 
 Why This Works?</br>
 
