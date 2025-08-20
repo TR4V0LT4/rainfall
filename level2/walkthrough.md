@@ -12,11 +12,11 @@ Inject shellcode into local_50 buffer:
 Why This Works?</br>
 
 NX disabled → heap is executable(Check only blocks stack addresses, not heap).</br>
+ASLR (Address Space Layout Randomization) is disabled.
 ```sh
 level2@RainFall:~$ cat /proc/sys/kernel/randomize_va_space
 0
 ```
-ASLR (Address Space Layout Randomization) is disabled.
 ASLR off → heap address is stable (e.g., 0x0804a008).
 strdup() gives us a writable+executable space for shellcode.
 
