@@ -45,6 +45,15 @@ $1 = {<text variable, no debug info>} 0x80484f4 <m>
 ```
 
 ## Two-Stage Heap Overflow → GOT Overwrite
+
+Chunk A (8 bytes) → contains [1, ptr_to_B]
+
+Chunk B (8 bytes) → destination of argv[1]
+
+Chunk C (8 bytes) → contains [2, ptr_to_D]
+
+Chunk D (8 bytes) → destination of argv[2]
+
 ### Stage 1: Overflow Chunk B to point puVar3[1] at puts@GOT
 ```
 #!/usr/bin/env python2
