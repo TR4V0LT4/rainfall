@@ -53,21 +53,18 @@ AAAA 41414141
 AAAA 24352520
 ...
 ```
-Look for 41414141 in the output. appears at %4$x, that means the offset is 4.
+Look for `41414141` in the output. appears at `%4$x`, that means the offset is 4.
 
-The string ' %%%d\$x' % $i
+The string `' %%%d\$x'` % $i
 
 In Python string formatting with %, the %d is replaced by the value of $i (a shell variable).
 
-%%%d\$x becomes:
+`' %%%d\$x'` becomes:
+- %% → a literal % in the string.
+- %d → replaced by the number $i.
+- \$x → literally $x.
 
-%% → a literal % in the string.
-
-%d → replaced by the number $i.
-
-\$x → literally $x.
-
-So if $i = 4, it becomes: %4$x
+So if $i = 4, it becomes: `%4$x`
 
 This is a format specifier for printf in C. It means: “print the 4th argument as a hexadecimal number.”
 

