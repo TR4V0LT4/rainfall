@@ -1,7 +1,6 @@
 LEVEL_2:
 # 📚 Exploiting `level2` – Exploit the overflow to get a shell.
-
-Since return-to-stack is blocked, we execute shellcode from the heap using strdup().
+this is a heap overflow, we execute shellcode from the heap using strdup().
 
 Exploit Strategy:</br>
 
