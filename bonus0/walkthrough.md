@@ -22,7 +22,7 @@ test1 test2
 
 ```c
 int main(void) {
-    char combined[54];
+    char s[54];
 
     // Read, combine, and print
     pp(combined);
