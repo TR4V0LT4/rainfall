@@ -32,12 +32,12 @@ int main(void) {
 }
 ```
 
-- Allocates a 42-byte buffer `s` (`local_3a`) at `esp+0x16`.
+- Allocates a 42-byte buffer `s` (`combined`) at `esp+0x16`.
 - Calls `pp(s)` to process inputs, then `puts(s)` to print the result.
 - Stack layout (from `sub $0x40, %esp` and `esp+0x16`):
 
   ```
-  [padding (22 bytes)] [local_3a (42 bytes)] [saved EBP (4 bytes)] [return address (4 bytes)]
+  [padding (22 bytes)] [combined (42 bytes)] [saved EBP (4 bytes)] [return address (4 bytes)]
   ```
 
   - `saved EBP` at `esp+0x48`, return address at `esp+0x4c`.
@@ -58,7 +58,7 @@ char *pp(char *dest) {
 
 - Declares `src` (20 bytes) and `v3` (28 bytes, though only 20 bytes used due to `p`).
 - Calls `p` to read inputs into `src` and `v3`.
-- Copies `src` to `dest` (`local_3a`) with `strcpy`, adds a space, and appends `v3` with `strcat`.
+- Copies `src` to `dest` (`combined`) with `strcpy`, adds a space, and appends `v3` with `strcat`.
 - **Vulnerability**: `strcpy` and `strcat` don’t check `dest`’s 42-byte limit, allowing overflow.
 
 #### `p` Function
@@ -77,14 +77,14 @@ char *p(char *dest, char *s) {
 
 ### Vulnerability
 
-- **Buffer Overflow**: `strcpy(dest, src)` and `strcat(dest, v3)` can overflow `local_3a` (42 bytes).
-- **Input Limit**: `strncpy` in `p` caps each input at 20 bytes, so `local_3a` gets 20 + 1 (space) + 20 = 41 bytes.
-- **Impact**: Can overwrite `saved EBP` (`esp+0x48`, 42 bytes from `local_3a`) or return address (`esp+0x4c`, 46 bytes).
+- **Buffer Overflow**: `strcpy(dest, src)` and `strcat(dest, v3)` can overflow `combined` (42 bytes).
+- **Input Limit**: `strncpy` in `p` caps each input at 20 bytes, so `combined` gets 20 + 1 (space) + 20 = 41 bytes.
+- **Impact**: Can overwrite `saved EBP` (`esp+0x48`, 42 bytes from `combined`) or return address (`esp+0x4c`, 46 bytes).
 - **Exploitable**: NX disabled allows shellcode execution; no PIE provides stable stack addresses.
 
 ## Exploitation Strategy
 
-1. **Place Shellcode**: Inject shellcode into `local_3a` via `src`.
+1. **Place Shellcode**: Inject shellcode into `combined` via `src`.
 2. **Overwrite saved EBP**: Use the second input to write a stack address pointing to shellcode.
 3. **Redirect Execution**: Leverage `main`’s `leave` (`mov esp, ebp; pop ebp`) and `ret` to jump to shellcode.
 
@@ -109,7 +109,7 @@ Stack dump:
 ```
 
 - **Key Addresses**:
-  - `local_3a` at `0xbfffe680` (contains `A`s).
+  - `combined` at `0xbfffe680` (contains `A`s).
   - `saved EBP` at `0xbfffe6ac` (42 bytes from `0xbfffe680`, contains `0x43434300`).
   - Return address at `0xbfffe6b0` (46 bytes, contains `0x43434343`).
   - `0xbfffe6d0` contains input data (likely shellcode).
@@ -128,7 +128,7 @@ The working payload:
 
 - **Mechanics**:
 
-  - `local_3a` (`0xbfffe680`) gets 20 NOPs + space + 9 `A`s + `0xbfffe6d0` + 7 NOPs = 41 bytes.
+  - `combined` (`0xbfffe680`) gets 20 NOPs + space + 9 `A`s + `0xbfffe6d0` + 7 NOPs = 41 bytes.
   - Overwrites `saved EBP` (`0xbfffe6ac`) with `0xbfffe6d0`.
   - `leave` sets `esp` to `0xbfffe6ac`, `ret` jumps to `0xbfffe6d0`, hitting shellcode.
 
@@ -143,9 +143,9 @@ The working payload:
 
 ### Why It Works
 
-- **Vulnerability**: `strcpy` and `strcat` allow overflow of `local_3a` (42 bytes).
+- **Vulnerability**: `strcpy` and `strcat` allow overflow of `combined` (42 bytes).
 - **Payload**:
-  - Places NOPs in `local_3a` (`0xbfffe680`).
+  - Places NOPs in `combined` (`0xbfffe680`).
   - Shellcode likely resides in `v3` or higher stack (`0xbfffe6d0`).
   - Overwrites `saved EBP` (`0xbfffe6ac`) with `0xbfffe6d0`.
   - `leave`/`ret` redirects to `0xbfffe6d0`, executing `execve("/bin/sh")`.
@@ -155,10 +155,10 @@ The working payload:
 
 Key Addresses:
 
-local_3a starts at 0xbfffe680 (contains A’s from test input).
+combined starts at 0xbfffe680 (contains A’s from test input).
 saved EBP at 0xbfffe6ac (42 bytes from 0xbfffe680, contains 0x43434300).
 Return address at 0xbfffe6b0 (46 bytes from 0xbfffe680, contains 0x43434343).
-0xbfffe6d0 (target address in payload) is beyond local_3a, likely where shellcode lands.
+0xbfffe6d0 (target address in payload) is beyond combined, likely where shellcode lands.
 
 
 
@@ -171,7 +171,7 @@ How the Payload Works:
 
 First Input: "\x90"*42 + shellcode (66 bytes, capped at 20 by strncpy).
 
-Copies 20 NOPs to local_34, then to local_3a (0xbfffe680).
+Copies 20 NOPs to local_34, then to combined (0xbfffe680).
 
 
 Second Input: "A" * 9 + "\xd0\xe6\xff\xbf" + "\x90" * 8 (capped at 20: A * 9 + "\xd0\xe6\xff\xbf" + "\x90" * 7).
@@ -181,7 +181,7 @@ Concatenates after a space at 0xbfffe680 + 21.
 
 Concatenation:
 
-local_3a: 20 NOPs + space + 9 A’s + 0xbfffe6d0 + 7 NOPs = 41 bytes.
+combined: 20 NOPs + space + 9 A’s + 0xbfffe6d0 + 7 NOPs = 41 bytes.
 Reaches 0xbfffe680 + 41 = 0xbfffe6a9, just before saved EBP (0xbfffe6ac).
 
 
@@ -200,7 +200,7 @@ The shellcode (execve("/bin/sh")) executes, spawning a bonus1 shell.
 
 Key Observations:
 
-The program reads two inputs (- prompts), concatenates them into local_3a (42 bytes in C code), and prints the result.
+The program reads two inputs (- prompts), concatenates them into combined (42 bytes in C code), and prints the result.
 The output shows the shellcode, padding (A’s), and the address 0xbfffe6d0, followed by whoami returning bonus1, indicating a successful shell with bonus1 privileges.
 The password for bonus1 is retrieved, confirming the exploit worked.
 
@@ -220,5 +220,5 @@ Second Input: "A" * 9 + "\xd0\xe6\xff\xbf" + "\x90" * 8
 
 Concatenation:
 
-local_34 (20 bytes) + space (1 byte) + local_20 (20 bytes) = 41 bytes into local_3a.
+local_34 (20 bytes) + space (1 byte) + local_20 (20 bytes) = 41 bytes into combined.
 ```
