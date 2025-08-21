@@ -21,11 +21,14 @@ test1 test2
 #### `main` Function
 
 ```c
-int main() {
-  char s[42]; // [esp+16h] [ebp-2Ah]
-  pp(s);
-  puts(s);
-  return 0;
+int main(void) {
+    char combined[54];
+
+    // Read, combine, and print
+    pp(combined);
+    puts(combined);
+
+    return 0;
 }
 ```
 
