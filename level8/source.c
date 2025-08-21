@@ -1,6 +1,6 @@
 
-char *auth = NULL;
-char *service = NULL;
+char *auth = NULL;    // stored at 0x8049aac
+char *service = NULL; // stored at 0x8049ab0
 char acStack_89[125]; // some service buffer
 
 int main(void) {
