@@ -1,7 +1,7 @@
 <h1 align="center"> bonus0 </h1>
 
 ## 🔍 Analysis of Decompiled [bonus0](./source.c)
-The binary’s vulnerability lies in the pp function’s use of strcpy and strcat, which don’t check the bounds of combined (54 bytes in the C code). Let’s analyze how the payload exploits this:
+The binary’s vulnerability lies in the pp function’s use of strcpy and strcat, which don’t check the bounds of combined (42 bytes in the C code). Let’s analyze how the payload exploits this:
 
 ### Running the Binary
 Executing `./bonus0`:
@@ -32,12 +32,12 @@ int main(void) {
 }
 ```
 
-- Allocates a 54-byte buffer `s` (`combined`) at `esp+0x16`.
+- Allocates a 42-byte buffer `s` (`combined`) at `esp+0x16`.
 - Calls `pp(s)` to process inputs, then `puts(s)` to print the result.
 - Stack layout (from `sub $0x40, %esp` and `esp+0x16`):
 
   ```
-  [padding (22 bytes)] [combined (54 bytes)] [saved EBP (4 bytes)] [return address (4 bytes)]
+  [padding (22 bytes)] [combined (42 bytes)] [saved EBP (4 bytes)] [return address (4 bytes)]
   ```
 
   - `saved EBP` at `esp+0x48`, return address at `esp+0x4c`.
@@ -59,7 +59,7 @@ char *pp(char *dest) {
 - Declares `src` (20 bytes) and `v3` (28 bytes, though only 20 bytes used due to `p`).
 - Calls `p` to read inputs into `src` and `v3`.
 - Copies `src` to `dest` (`combined`) with `strcpy`, adds a space, and appends `v3` with `strcat`.
-- **Vulnerability**: `strcpy` and `strcat` don’t check `dest`’s 54-byte limit, allowing overflow.
+- **Vulnerability**: `strcpy` and `strcat` don’t check `dest`’s 42-byte limit, allowing overflow.
 
 #### `p` Function
 
@@ -77,9 +77,9 @@ char *p(char *dest, char *s) {
 
 ### Vulnerability
 
-- **Buffer Overflow**: `strcpy(dest, src)` and `strcat(dest, v3)` can overflow `combined` (54 bytes).
+- **Buffer Overflow**: `strcpy(dest, src)` and `strcat(dest, v3)` can overflow `combined` (42 bytes).
 - **Input Limit**: `strncpy` in `p` caps each input at 20 bytes, so `combined` gets 20 + 1 (space) + 20 = 41 bytes.
-- **Impact**: Can overwrite `saved EBP` (`esp+0x48`, 54 bytes from `combined`) or return address (`esp+0x4c`, 46 bytes).
+- **Impact**: Can overwrite `saved EBP` (`esp+0x48`, 42 bytes from `combined`) or return address (`esp+0x4c`, 46 bytes).
 - **Exploitable**: NX disabled allows shellcode execution; no PIE provides stable stack addresses.
 
 ## Exploitation Strategy
@@ -110,7 +110,7 @@ Stack dump:
 
 - **Key Addresses**:
   - `combined` at `0xbfffe680` (contains `A`s).
-  - `saved EBP` at `0xbfffe6ac` (54 bytes from `0xbfffe680`, contains `0x43434300`).
+  - `saved EBP` at `0xbfffe6ac` (42 bytes from `0xbfffe680`, contains `0x43434300`).
   - Return address at `0xbfffe6b0` (46 bytes, contains `0x43434343`).
   - `0xbfffe6d0` contains input data (likely shellcode).
 
@@ -165,7 +165,7 @@ Return address at 0xbfffe6b0 (46 bytes from 0xbfffe680, contains 0x43434343).
 Why 42 Bytes in C Code?:
 
 The C code shows char s[42], but main’s disassembly (sub $0x40, %esp) and esp+0x16 suggest a 42-byte buffer, confirmed by the overflow behavior.
-Previous assumption of 54 bytes was incorrect, based on misaligned GDB output (0xbffff706).
+Previous assumption of 42 bytes was incorrect, based on misaligned GDB output (0xbffff706).
 
 How the Payload Works:
 
