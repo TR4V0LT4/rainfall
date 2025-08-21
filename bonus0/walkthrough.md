@@ -1,6 +1,6 @@
-<h1 align="center"> LEVEL 9 </h1>
+<h1 align="center"> bonus0 </h1>
 
-## 🔍 Analysis of Decompiled [level9](./source.c)
+## 🔍 Analysis of Decompiled [bonus0](./source.c)
 The binary’s vulnerability lies in the pp function’s use of strcpy and strcat, which don’t check the bounds of combined (42 bytes in the C code). Let’s analyze how the payload exploits this:
 
 ### Running the Binary
