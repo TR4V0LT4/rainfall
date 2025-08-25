@@ -9,9 +9,11 @@ RainFall is a binary exploitation wargame that focuses on teaching various memor
 ```
 rainfall/
 ├── README.md           # This file
-├── writeup.md         # Detailed solutions for all levels
-├── binaries/          # contain the binaries of all the levels
-└── passwords.txt      # Collected passwords from each level
+├── binaries/           # contain the binaries of all the levels
+├── level0-9/              
+    ├── writeup.md      # Detailed solutions for this level
+    ├── flag            # The flag of this level 
+    ├── source.c         # decompiled binary
 ```
 
 ## Challenge Levels
@@ -89,19 +91,8 @@ Most RainFall binaries have minimal protections:
 - Function pointer overwrites
 - Chunk corruption
 
-## Resources
-
-### Documentation
-- [Detailed writeups](writeup.md)
-
-### References
-<!-- - OWASP Binary Exploitation
-- Phrack Magazine
-- "The Shellcoder's Handbook"
-- "Hacking: The Art of Exploitation" -->
-
-
 ## Disclaimer
 
 The information provided in this repository is for educational and research purposes only. Users are responsible for ensuring they have proper authorization before testing these techniques on any systems.
+
 
